@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Switcher</title>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.light {
+            background-color: white;
+            color: black;
+        }
+
+        body.dark {
+            background-color: black;
+            color: white;
+        }
+    </style>
+    <script>
+        function applyTheme(theme) {
+            document.body.classList.remove('light', 'dark');
+            if (theme === 'dark') {
+                document.body.classList.add('dark');
+            } else if (theme === 'light') {
+                document.body.classList.add('light');
+            }
+        }
+
+        function setTheme(theme) {
+            if (theme) {
+                localStorage.setItem('theme', theme);
+            } else {
+                localStorage.removeItem('theme');
+            }
+            applyTheme(theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else {
+                applyTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light');
+            }
+
+            document.getElementById('light-mode').addEventListener('click', () => setTheme('light'));
+            document.getElementById('dark-mode').addEventListener('click', () => setTheme('dark'));
+            document.getElementById('system-mode').addEventListener('click', () => {
+                localStorage.removeItem('theme');
+                applyTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light');
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <button id="light-mode" type="button">Light Mode</button>
+    <button id="dark-mode" type="button">Dark Mode</button>
+    <button id="system-mode" type="button">System Mode</button>
+</body>
+
+</html>

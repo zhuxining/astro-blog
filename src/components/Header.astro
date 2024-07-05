@@ -1,6 +1,7 @@
 ---
 import { SITE_TITLE } from "../consts";
 import HeaderLink from "./HeaderLink.astro";
+import ThemeToggler from "./ThemeToggler.astro";
 ---
 
 <header
@@ -15,5 +16,6 @@ import HeaderLink from "./HeaderLink.astro";
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
 		</div>
+		<ThemeToggler />
 	</nav>
 </header>
