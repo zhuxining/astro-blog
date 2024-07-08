@@ -8,14 +8,14 @@ const themes = [
 ];
 ---
 
-<div transition:persist class="flex gap-3 forced-colors:hidden">
+<div class="flex gap-3 forced-colors:hidden">
     {
         themes.map((theme) => (
             <button
                 type="button"
                 class="theme-toggler opacity-75 aria-pressed:opacity-100 hover:opacity-100"
                 aria-pressed="false"
-                aria-label={`Switch to ${theme.name} theme`}
+                aria-label={`Switch to ${theme.name}`}
                 data-theme={theme.name}
             >
                 <Icon name={theme.icon} class="fill-current" />
@@ -35,24 +35,50 @@ const themes = [
             ?.setAttribute("aria-pressed", "true");
         document.documentElement.classList.add(newTheme);
     });
+    function applyTheme(theme: string | null) {
+        if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+            localStorage.theme = "dark";
+        } else if (theme === "light") {
+            document.documentElement.classList.remove("dark");
+            localStorage.theme = "light";
+        } else {
+            localStorage.removeItem("theme");
+            if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        }
+        updateAriaPressed(theme);
+    }
 
-    const toggle = (document: Document) => {
-        const initialTheme = theme.get();
-        document.documentElement.classList.add(initialTheme);
-        document
-            .querySelector(`.theme-toggler[data-theme="${initialTheme}"]`)
-            ?.setAttribute("aria-pressed", "true");
+    function updateAriaPressed(theme: string | null) {
+        document.querySelectorAll(".theme-toggler").forEach((button) => {
+            button.setAttribute(
+                "aria-pressed",
+                button.getAttribute("data-theme") === theme ? "true" : "false",
+            );
+        });
+    }
 
-        const themeTogglers = document.querySelectorAll(".theme-toggler");
-        themeTogglers.forEach((button) => {
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentTheme = localStorage.theme || "os-default";
+        applyTheme(currentTheme);
+        updateAriaPressed(currentTheme);
+
+        document.querySelectorAll(".theme-toggler").forEach((button) => {
             button.addEventListener("click", () => {
-                const newTheme = button.getAttribute("data-theme")!;
-                theme.set(newTheme);
+                applyTheme(button.getAttribute("data-theme"));
             });
         });
-    };
-    toggle(document);
-    document.addEventListener("astro:before-swap", (ev) =>
-        toggle(ev.newDocument),
-    );
+
+        window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", (e) => {
+                if (!("theme" in localStorage)) {
+                    applyTheme(e.matches ? "dark" : "light");
+                }
+            });
+    });
 </script>

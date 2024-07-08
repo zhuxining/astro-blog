@@ -5,9 +5,6 @@
 @layer base {
 	:root {
 		@apply scroll-smooth antialiased;
-	}
-
-	:root:not(.light) {
 		--background: hsl(0, 0%, 100%);
 		--foreground: hsl(224, 71.4%, 4.1%);
 
@@ -15,7 +12,7 @@
 
 	}
 
-	:root:is(.dark) {
+	.dark {
 		--background: hsl(224, 71.4%, 4.1%);
 		--foreground: hsl(210, 20%, 98%);
 

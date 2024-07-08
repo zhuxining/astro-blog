@@ -2,7 +2,6 @@
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
 import "../styles/global.css";
-import applyTheme from "../ddd";
 interface Props {
 	title: string;
 	description: string;
@@ -51,5 +50,14 @@ const { title, description, image = "/blog-placeholder-1.jpg" } = Astro.props;
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 <script>
-	applyTheme();
+	// 在页面加载时应用主题，避免 FOUC
+	if (
+		localStorage.theme === "dark" ||
+		(!("theme" in localStorage) &&
+			window.matchMedia("(prefers-color-scheme: dark)").matches)
+	) {
+		document.documentElement.classList.add("dark");
+	} else {
+		document.documentElement.classList.remove("dark");
+	}
 </script>
