@@ -25,7 +25,7 @@ const themes = [
 </div>
 <script>
     import { theme } from "../store";
-    theme.subscribe((newTheme: string, oldTheme: string) => {
+    theme.subscribe((newTheme: string, oldTheme: string | undefined) => {
         oldTheme && document.documentElement.classList.remove(oldTheme);
         document
             .querySelector(`.theme-toggler[data-theme="${oldTheme}"]`)

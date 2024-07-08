@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Tailwind CSS Dark Mode Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'selector'
+        }
+    </script>
+    <script>
+        function applyTheme() {
+            if (
+                localStorage.theme === "dark" ||
+                (!("theme" in localStorage) &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        }
+        applyTheme();
+    </script>
+</head>
+
+<body class="bg-white dark:bg-gray-800 text-black dark:text-white transition-colors duration-300">
+
+
+    <script>
+        // 在页面加载或主题改变时，最好内联在 `head` 中以避免 FOUC
+        function applyTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        applyTheme();
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const systemPreference = document.getElementById('systemPreference');
+        const modeStatus = document.getElementById('modeStatus');
+
+        function updateModeStatus() {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            modeStatus.textContent = `Current mode: ${isDarkMode ? 'Dark' : 'Light'}`;
+        }
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark') &&
+                    document.documentElement.classList.add('light');
+                localStorage.theme = 'light';
+            } else {
+                localStorage.removeItem('theme');
+                applyTheme();
+            }
+            updateModeStatus();
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        });
+
+        systemPreference.addEventListener('click', () => {
+            setTheme('system');
+        });
+
+        // 初始化时更新状态显示
+        updateModeStatus();
+
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!('theme' in localStorage)) {
+                applyTheme();
+                updateModeStatus();
+            }
+        });
+    </script>
+</body>
+
+</html>

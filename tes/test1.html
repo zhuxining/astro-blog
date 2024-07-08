@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS Dark Mode Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'selector'
+        }
+    </script>
+</head>
+
+<body class="bg-white dark:bg-gray-800 text-black dark:text-white transition-colors duration-300">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Tailwind CSS Dark Mode Demo</h1>
+        <button id="darkModeToggle" class="px-4 py-2 bg-blue-500 dark:bg-blue-700 text-white rounded">
+            Toggle Dark Mode
+        </button>
+        <p id="modeStatus" class="mt-4">Current mode: Light</p>
+    </div>
+
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const modeStatus = document.getElementById('modeStatus');
+
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            updateModeStatus();
+        });
+
+        function updateModeStatus() {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            modeStatus.textContent = `Current mode: ${isDarkMode ? 'Dark' : 'Light'}`;
+        }
+
+        // 初始化时检查首选配色方案
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+            updateModeStatus();
+        }
+    </script>
+</body>
+
+</html>
