@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import { theme } from "../store";
 
 const themes = [
     { name: "os-default", icon: "ri:contrast-fill" },
@@ -7,6 +8,67 @@ const themes = [
     { name: "dark", icon: "ri:moon-line" },
 ];
 ---
+
+<script>
+    // Set the theme based on the preference or system default.
+    function setTheme(newTheme: string) {
+        // Remove any existing theme class and add the new one.
+        document.documentElement.className = newTheme;
+        // Update local storage with the new theme.
+        localStorage.setItem("theme", newTheme);
+    }
+
+    // Update the ARIA 'pressed' state of buttons.
+    function updateAriaPressed(theme: string) {
+        document
+            .querySelectorAll(".theme-toggler")
+            .forEach((button) =>
+                button.setAttribute(
+                    "aria-pressed",
+                    button.getAttribute("data-theme") === theme
+                        ? "true"
+                        : "false",
+                ),
+            );
+    }
+
+    // Listen for theme changes and update the UI accordingly.
+    function handleThemeChange() {
+        const currentTheme = localStorage.getItem("theme") || "os-default";
+        setTheme(currentTheme);
+        updateAriaPressed(currentTheme);
+    }
+
+    // Add event listener for theme toggling.
+    function addThemeListeners() {
+        document.querySelectorAll(".theme-toggler").forEach((button) => {
+            button.addEventListener("click", () => {
+                const newTheme =
+                    button.getAttribute("data-theme") || "os-default";
+                setTheme(newTheme);
+                updateAriaPressed(newTheme);
+            });
+        });
+    }
+
+    // Listen for system color scheme changes.
+    function listenForSystemColorSchemeChange() {
+        window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", (e) => {
+                if (!localStorage.getItem("theme")) {
+                    setTheme(e.matches ? "dark" : "light");
+                }
+            });
+    }
+
+    // Initialize the theme when the DOM is ready.
+    document.addEventListener("DOMContentLoaded", () => {
+        handleThemeChange();
+        addThemeListeners();
+        listenForSystemColorSchemeChange();
+    });
+</script>
 
 <div class="flex gap-3 forced-colors:hidden">
     {
@@ -23,62 +85,3 @@ const themes = [
         ))
     }
 </div>
-<script>
-    import { theme } from "../store";
-    theme.subscribe((newTheme: string, oldTheme: string | undefined) => {
-        oldTheme && document.documentElement.classList.remove(oldTheme);
-        document
-            .querySelector(`.theme-toggler[data-theme="${oldTheme}"]`)
-            ?.setAttribute("aria-pressed", "false");
-        document
-            .querySelector(`.theme-toggler[data-theme="${newTheme}"]`)
-            ?.setAttribute("aria-pressed", "true");
-        document.documentElement.classList.add(newTheme);
-    });
-    function applyTheme(theme: string | null) {
-        if (theme === "dark") {
-            document.documentElement.classList.add("dark");
-            localStorage.theme = "dark";
-        } else if (theme === "light") {
-            document.documentElement.classList.remove("dark");
-            localStorage.theme = "light";
-        } else {
-            localStorage.removeItem("theme");
-            if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-                document.documentElement.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
-            }
-        }
-        updateAriaPressed(theme);
-    }
-
-    function updateAriaPressed(theme: string | null) {
-        document.querySelectorAll(".theme-toggler").forEach((button) => {
-            button.setAttribute(
-                "aria-pressed",
-                button.getAttribute("data-theme") === theme ? "true" : "false",
-            );
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const currentTheme = localStorage.theme || "os-default";
-        applyTheme(currentTheme);
-        updateAriaPressed(currentTheme);
-
-        document.querySelectorAll(".theme-toggler").forEach((button) => {
-            button.addEventListener("click", () => {
-                applyTheme(button.getAttribute("data-theme"));
-            });
-        });
-
-        window
-            .matchMedia("(prefers-color-scheme: dark)")
-            .addEventListener("change", (e) => {
-                if (!("theme" in localStorage)) {
-                    applyTheme(e.matches ? "dark" : "light");
-                }
-            });
-    });
-</script>
