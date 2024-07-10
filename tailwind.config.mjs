@@ -39,7 +39,7 @@ export default {
 			},
 		},
 	},
-	// darkMode: ["variant", ["@media (prefers-color-scheme: dark) { &:not(.light *) }", "&:is(.dark *)"]],
+
 	darkMode: "selector",
 	plugins: [require("@tailwindcss/typography")],
 };

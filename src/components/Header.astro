@@ -5,12 +5,10 @@ import ThemeToggler from "./ThemeToggler.astro";
 ---
 
 <header
-	class="sticky top-0 z-50 w-full border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+	class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
 >
-	<nav
-		class="container mx-auto flex justify-between p-4 hover:text-foreground/80"
-	>
-		<a href="/" class="text-xl font-bold">{SITE_TITLE}</a>
+	<nav class="container mx-auto flex justify-between p-4">
+		<a href="/" class="text-xl font-bold hover:underline">{SITE_TITLE}</a>
 		<div class="flex items-center gap-4 lg:gap-6">
 			<HeaderLink href="/">Home</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
