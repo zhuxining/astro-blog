@@ -1,9 +1,8 @@
 ---
 import { Icon } from "astro-icon/components";
-import { theme } from "../store";
 
 const themes = [
-    { name: "os-default", icon: "ri:contrast-fill" },
+    // { name: "os-default", icon: "ri:contrast-line" },
     { name: "light", icon: "ri:sun-fill" },
     { name: "dark", icon: "ri:moon-line" },
 ];
@@ -14,7 +13,7 @@ const themes = [
         themes.map((theme) => (
             <button
                 type="button"
-                class="theme-toggler opacity-75 aria-pressed:opacity-100 hover:opacity-100"
+                class="theme-toggler opacity-50 aria-pressed:opacity-90 hover:opacity-100"
                 aria-pressed="false"
                 aria-label={`Switch to ${theme.name}`}
                 data-theme={theme.name}
@@ -24,64 +23,39 @@ const themes = [
         ))
     }
 </div>
-
 <script>
-    // Set the theme based on the preference or system default.
-    function setTheme(newTheme: string) {
-        // Remove any existing theme class and add the new one.
-        document.documentElement.className = newTheme;
-        // Update local storage with the new theme.
-        localStorage.setItem("theme", newTheme);
-    }
-
-    // Update the ARIA 'pressed' state of buttons.
-    function updateAriaPressed(theme: string) {
-        document
-            .querySelectorAll(".theme-toggler")
-            .forEach((button) =>
-                button.setAttribute(
-                    "aria-pressed",
-                    button.getAttribute("data-theme") === theme
-                        ? "true"
-                        : "false",
-                ),
-            );
-    }
-
-    // Listen for theme changes and update the UI accordingly.
-    function handleThemeChange() {
-        const currentTheme = localStorage.getItem("theme") || "os-default";
-        setTheme(currentTheme);
-        updateAriaPressed(currentTheme);
-    }
-
-    // Add event listener for theme toggling.
-    function addThemeListeners() {
-        document.querySelectorAll(".theme-toggler").forEach((button) => {
+    import { theme } from "../store";
+    const handleThemeChange = (event: MediaQueryListEvent) => {
+        theme.set(event.matches ? "dark" : "light");
+    };
+    const toggle = (document: Document) => {
+        const initialTheme = theme.get();
+        document.documentElement.classList.add(initialTheme);
+        const themeTogglers = document.querySelectorAll(".theme-toggler");
+        themeTogglers.forEach((button) => {
             button.addEventListener("click", () => {
-                const newTheme =
-                    button.getAttribute("data-theme") || "os-default";
-                setTheme(newTheme);
-                updateAriaPressed(newTheme);
+                const newTheme = button.getAttribute("data-theme")!;
+                theme.set(newTheme);
             });
         });
-    }
-
-    // Listen for system color scheme changes.
-    function listenForSystemColorSchemeChange() {
-        window
-            .matchMedia("(prefers-color-scheme: dark)")
-            .addEventListener("change", (e) => {
-                if (!localStorage.getItem("theme")) {
-                    setTheme(e.matches ? "dark" : "light");
-                }
-            });
-    }
-
-    // Initialize the theme when the DOM is ready.
-    document.addEventListener("DOMContentLoaded", () => {
-        handleThemeChange();
-        addThemeListeners();
-        listenForSystemColorSchemeChange();
+    };
+    theme.subscribe((newTheme: string, oldTheme: string | undefined) => {
+        oldTheme && document.documentElement.classList.remove(oldTheme);
+        document
+            .querySelector(`.theme-toggler[data-theme="${oldTheme}"]`)
+            ?.setAttribute("aria-pressed", "false");
+        document
+            .querySelector(`.theme-toggler[data-theme="${newTheme}"]`)
+            ?.setAttribute("aria-pressed", "true");
+        document.documentElement.classList.add(newTheme);
+        localStorage.setItem("theme", newTheme);
     });
+    toggle(document);
+    document.addEventListener("astro:before-swap", (ev) =>
+        toggle(ev.newDocument),
+    );
+    const darkModeMediaQuery = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+    );
+    darkModeMediaQuery.addEventListener("change", handleThemeChange);
 </script>
